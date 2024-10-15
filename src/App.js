@@ -1,85 +1,96 @@
+import React, { useState } from 'react';
 
-import React, {useState} from 'react';
-import './App.css';
-
+// Mock data for payment transactions
 const mockTransactions = [
-  { id: 1, date: "2021-01-01", description: "Transaction 1", amount: 100 },
-  { id: 2, date: "2021-03-02", description: "Transaction 2", amount: -50 },
-  { id: 3, date: "2021-01-02", description: "Transaction 3", amount: -150 },
-  { id: 4, date: "2021-04-02", description: "Transaction 4", amount: 550 },
-  { id: 5, date: "2021-06-02", description: "Transaction 5", amount: 590 },
-  { id: 6, date: "2021-01-02", description: "Transaction 6", amount: 340 },
-  { id: 7, date: "2021-08-02", description: "Transaction 7", amount: 3760 },
-  { id: 8, date: "2021-09-02", description: "Transaction 8", amount: 50 },
+  { id: 1, date: '2024-10-01', amount: 120.50, status: 'Completed', payer: 'John Doe' },
+  { id: 2, date: '2024-10-05', amount: 75.00, status: 'Pending', payer: 'Jane Smith' },
+  { id: 3, date: '2024-10-10', amount: 200.00, status: 'Failed', payer: 'Alex Johnson' },
+  { id: 4, date: '2024-10-12', amount: 50.75, status: 'Completed', payer: 'Emma Brown' },
+  { id: 5, date: '2024-10-13', amount: 180.00, status: 'Completed', payer: 'Liam Davis' }
 ];
 
-const PaymentsTable = ({transactions}) => {
+// PaymentsTable Component
+const PaymentsTable = ({ transactions }) => {
   return (
-    <div>
-      <h1>Payments</h1>
-      <table>
-        <thead>
-          <tr>
-            <td>ID</td>
-            <td>Date</td>
-            <td>Description</td>
-            <td>Amount</td>
+    <table border="1" style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Date</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Payer</th>
+        </tr>
+      </thead>
+      <tbody>
+        {transactions.map((transaction) => (
+          <tr key={transaction.id}>
+            <td>{transaction.id}</td>
+            <td>{transaction.date}</td>
+            <td>${transaction.amount.toFixed(2)}</td>
+            <td>{transaction.status}</td>
+            <td>{transaction.payer}</td>
           </tr>
-        </thead>
-        <tbody>
-          {transactions.map((transaction) => (
-            <tr key={transaction.id}>
-              <td>{transaction.id}</td>
-              <td>{transaction.date}</td>
-              <td>{transaction.description}</td>
-              <td>{transaction.amount}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+        ))}
+      </tbody>
+    </table>
   );
-}
-const App = () => {
-  const [transactions] = useState(mockTransactions);
-  const [filteredTransactions, setFilteredTransactions] = useState(transactions);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+};
 
+// Main App Component
+const App = () => {
+  const [transactions] = useState(mockTransactions); // Original transactions data
+  const [filteredTransactions, setFilteredTransactions] = useState(transactions);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
+  // Function to handle date range filtering
   const filterTransactions = () => {
     if (!startDate || !endDate) {
-      setFilteredTransactions(transactions);
+      setFilteredTransactions(transactions); // If dates are empty, show all transactions
       return;
     }
-    
-    const filtered = transactions.filter((transaction => {
+
+    const filtered = transactions.filter(transaction => {
       const transactionDate = new Date(transaction.date);
       const start = new Date(startDate);
       const end = new Date(endDate);
+
+      // Check if transaction date is within the selected range
       return transactionDate >= start && transactionDate <= end;
-    }));
+    });
     setFilteredTransactions(filtered);
   };
 
-  
   return (
-    <div className="App">
-        <p>test</p>
-        <div>
-          <label>
-            Start Date:
-            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-          </label>
-          <label>
-            End Date:
-          </label>
-          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-          <button onClick={filterTransactions}>Filter</button>
-        </div>
+    <div>
+      <h2>Payment Transactions</h2>
 
-        <PaymentsTable transactions={filterTransactions} />
+      {/* Date range filters */}
+      <div>
+        <label>
+          Start Date:
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+        </label>
+        <label>
+          End Date:
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+        </label>
+        <button onClick={filterTransactions}>Filter</button>
+      </div>
+
+      {/* Render the filtered transactions */}
+      <PaymentsTable transactions={filteredTransactions} />
     </div>
   );
-}
+};
 
 export default App;
